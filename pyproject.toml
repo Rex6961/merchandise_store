@@ -1,0 +1,45 @@
+[project]
+name = "merchandise-store"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Rex6961",email = "aon777ar@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "uvicorn (>=0.34.2,<0.35.0)",
+    "uvicorn-worker (>=0.3.0,<0.4.0)",
+    "gunicorn (>=23.0.0,<24.0.0)"
+]
+
+[tool.poetry]
+packages = [{include = "merchandise_store", from = "src/admin_panel"}]
+
+
+[tool.poetry.group.Django.dependencies]
+django = "^5.2.1"
+django-import-export = "^4.3.7"
+pillow = "^11.2.1"
+
+
+[tool.poetry.group.pydantic-settings.dependencies]
+pydantic-settings = "^2.9.1"
+
+
+[tool.poetry.group.postgres.dependencies]
+psycopg = {extras = ["binary"], version = "^3.2.9"}
+
+
+[tool.poetry.group.celery.dependencies]
+celery = "^5.5.2"
+redis = "^6.1.0"
+
+
+[tool.poetry.group.telegram_bot.dependencies]
+aiogram = "^3.20.0.post0"
+asgiref = "^3.8.1"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
