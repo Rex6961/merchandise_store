@@ -1,0 +1,20 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    <p>{% blocktrans count counter=queryset.count %}Вы выбрали {{ counter }} клиента.{% plural %}Вы выбрали {{ counter }} клиентов.{% endblocktrans %}</p>
+    
+    {{ form.as_p }}
+
+    <div>
+        {% for obj in queryset %}
+        <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk }}">
+        {% endfor %}
+        <input type="hidden" name="action" value="send_selected_newsletter_action">
+        <input type="submit" name="apply" value="Отправить рассылку" class="button">
+        <a href="#" onclick="window.history.back(); return false;" class="button cancel-link">{% trans "Cancel" %}</a>
+    </div>
+</form>
+{% endblock %}
