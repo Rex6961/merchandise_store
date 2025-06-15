@@ -1,8 +1,81 @@
 ```markdown
 # Проект Telegram-бота с Django Админ-панелью и Celery
 
-Это проект Telegram-бота, интегрированного с Django для администрирования и использующего Celery для обработки фоновых задач, таких как рассылки.
+Это проект Telegram-бота, интегрированного с Django для администрирования и использующего Celery 
+для обработки фоновых задач, таких как рассылки.
+```
+```mermaid
+graph TB
+    subgraph "Внешний мир"
+        direction LR
+        User["👤 Пользователь"]
+        Admin["👑 Администратор"]
+    end
 
+    subgraph "Инфраструктура Docker"
+        direction TB
+
+        %% Уровень 1: Точки входа
+        subgraph " "
+            direction LR
+            Nginx["🌐 Nginx (Reverse Proxy)"]
+            TelegramAPI["✈️ Telegram API (Внешний шлюз)"]
+        end
+
+        %% Уровень 2: Приложения
+        subgraph " "
+            direction LR
+            Django["⚙️ Django (Админ-панель, Логика)"]
+            Bot["🤖 Aiogram Bot (Обработчик команд, FSM)"]
+        end
+
+        %% Уровень 3: Асинхронная обработка
+        subgraph " "
+            direction LR
+            CeleryGeneral["📋 Celery Worker (Общие задачи)"]
+            CelerySender["📨 Celery Sender (Отправка в Telegram)"]
+        end
+
+        %% Уровень 4: Хранилища данных
+        subgraph " "
+            direction LR
+            Postgres[("🗄️ PostgreSQL (База данных)")]
+            Redis[("⚡ Redis (Брокер)")]
+        end
+    end
+
+    %% СВЯЗИ
+    Admin -- "HTTP/S Запросы" --> Nginx
+    Nginx --> Django
+    User -- "Команды, колбэки" --> TelegramAPI
+    TelegramAPI -- "Обновления" --> Bot
+    Bot -- "Ответы пользователю" --> TelegramAPI
+    TelegramAPI -- "Сообщения" --> User
+    Django -- "CRUD" --> Postgres
+    Bot -- "Чтение/Запись" --> Postgres
+    
+    %% Сценарий рассылки (БЕЗ НУМЕРАЦИИ В МЕТКАХ)
+    Django -- "Постановка задачи" --> Redis
+    Redis -- "Задачи 'default'" --> CeleryGeneral
+    CeleryGeneral -- "Создание подзадач" --> Redis
+    Redis -- "Задачи 'telegram_sending_queue'" --> CelerySender
+    CelerySender -- "Отправка через API" --> TelegramAPI
+    CeleryGeneral -. "Чтение пользователей" .-> Postgres
+
+    %% СТИЛИЗАЦИЯ (ВЫСОКИЙ КОНТРАСТ + ЯРКИЕ ЦВЕТА)
+    %% Внешние акторы
+    style Admin fill:#F4F4F4,stroke:#555,stroke-width:2px,color:#000
+    
+    %% Компоненты с брендовыми цветами
+    style Nginx fill:#FFF,stroke:#009639,stroke-width:4px,color:#000
+    style TelegramAPI fill:#FFF,stroke:#2AABEE,stroke-width:4px,color:#000
+    style Django fill:#FFF,stroke:#092E20,stroke-width:4px,color:#000
+    style Bot fill:#FFF,stroke:#34A2D4,stroke-width:4px,color:#000
+    style Postgres fill:#FFF,stroke:#336791,stroke-width:4px,color:#000
+    style Redis fill:#FFF,stroke:#D82C20,stroke-width:4px,color:#000
+    style CelerySender fill:#FFF,stroke:#E65100,stroke-width:4px,color:#000
+```
+```markdown
 ## Особенности
 
 *   **Telegram Бот:**
